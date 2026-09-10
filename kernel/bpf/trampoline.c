@@ -211,9 +211,14 @@ static int bpf_trampoline_update(struct bpf_trampoline *tr)
 	    tprogs[BPF_TRAMP_MODIFY_RETURN].nr_progs)
 		flags = BPF_TRAMP_F_CALL_ORIG | BPF_TRAMP_F_SKIP_FRAME;
 
-	err = arch_prepare_bpf_trampoline(im, im->image, im->image + PAGE_SIZE,
-	if (ip_arg)
+if (ip_arg)
 		flags |= BPF_TRAMP_F_IP_ARG;
+
+	err = arch_prepare_bpf_trampoline(im, im->image, im->image + PAGE_SIZE,
+					  &tr->func.model, flags, tprogs,
+					  tr->func.addr);
+	if (err < 0)
+		goto out;
 
 	/* Though the second half of trampoline page is unused a task could be
 	 * preempted in the middle of the first half of trampoline and two
@@ -234,6 +239,9 @@ static int bpf_trampoline_update(struct bpf_trampoline *tr)
 		goto out;
 
 	if (tr->selector)
+	WARN_ON(tr->cur_image && tr->selector == 0);
+	WARN_ON(!tr->cur_image && tr->selector);
+	if (tr->cur_image)
 		/* progs already running at this address */
 		err = modify_fentry(tr, old_image, new_image);
 	else
