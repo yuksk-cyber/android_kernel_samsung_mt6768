@@ -1417,6 +1417,7 @@ struct task_struct {
 	unsigned short inherit_cnt:14;
 	short nice_backup;
 	atomic_t inherit_types;
+#endif
 #ifdef CONFIG_BPF_SYSCALL
 	/* Used by BPF task local storage. */
 	struct bpf_local_storage __rcu	*bpf_storage;
