@@ -5,6 +5,8 @@
 #
 mainmenu "Linux/$ARCH $KERNELVERSION Kernel Configuration"
 
+source "scripts/Kconfig.include"
+
 config SRCARCH
 	string
 	option env="SRCARCH"
